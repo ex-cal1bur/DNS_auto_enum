@@ -11,7 +11,6 @@ www_ip=$(grep "^www\." "$folder/$nameserver_data" | awk '{print $NF}' | head -n1
 
 mkdir -p "$folder"
 
-# WHOIS: Ejecutar una sola vez, imprimir y guardar
 echo
 echo "=== WHOIS Information ==="
 whois "$Dname" | grep -iE "Name server|Name:|Organization|Address|Phone|Email" | tee "$folder/$whois_data"
@@ -24,7 +23,6 @@ echo
 echo "Enter the list for domain enumeration (ej: /usr/share/seclists/...):"
 read Lname
 
-# Enumerar subdominios en paralelo, guardar y mostrar
 echo
 echo "=== DNS Enumeration ==="
 for ip in $(cat "$Lname"); do
