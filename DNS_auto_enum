@@ -18,7 +18,6 @@ whois "$Dname" | grep -iE "Name server|Name:|Organization|Address|Phone|Email" |
 echo
 echo "Whois info saved in $folder/$whois_data"
 
-# Pide la lista de subdominios
 echo
 echo "Enter the list for domain enumeration (ej: /usr/share/seclists/...):"
 read Lname
