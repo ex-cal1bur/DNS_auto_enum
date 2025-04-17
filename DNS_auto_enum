@@ -1,5 +1,44 @@
-sudo apt install seclists
+#!/bin/bash
 
-for ip in $(cat /usr/share/seclists/Discovery/DNS/subdomains-top1million-20000.txt); do host $ip.megacorpone.com; done |grep "has address"
+echo "Enter the domain name:"
+read Dname
 
+folder=$Dname
+whois_data="whois_$Dname"
+nameserver_data="nameserver_$Dname"
+nmap_data="nmap_$Dname"
+www_ip=$(grep "^www\." "$folder/$nameserver_data" | awk '{print $NF}' | head -n1)
 
+mkdir -p "$folder"
+
+# WHOIS: Ejecutar una sola vez, imprimir y guardar
+echo
+echo "=== WHOIS Information ==="
+whois "$Dname" | grep -iE "Name server|Name:|Organization|Address|Phone|Email" | tee "$folder/$whois_data"
+
+echo
+echo "Whois info saved in $folder/$whois_data"
+
+# Pide la lista de subdominios
+echo
+echo "Enter the list for domain enumeration (ej: /usr/share/seclists/...):"
+read Lname
+
+# Enumerar subdominios en paralelo, guardar y mostrar
+echo
+echo "=== DNS Enumeration ==="
+for ip in $(cat "$Lname"); do
+    resultado=$(host "$ip.$Dname" 2>/dev/null)
+    if echo "$resultado" | grep -q "has address"; then
+        echo "$resultado" | tee -a "$folder/$nameserver_data"
+    fi
+done
+echo
+echo "NameServer info saved in $folder/$nameserver_data"
+
+echo
+echo "=== Nmap scan  ==="
+nmap -Pn -sV "$www_ip" | tee "$folder/$nmap_data"
+
+echo
+echo "Nmap scan info saved in $folder/$nmap_data"
